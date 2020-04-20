@@ -2,8 +2,8 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
-from tensorflow.contrib.framework.python.ops import audio_ops
-from tensorflow.contrib import ffmpeg
+#from tensorflow.contrib.framework.python.ops import audio_ops
+from tensorflow import audio as audio_ops
 from scipy.fftpack import rfft, irfft
 from glob import iglob
 from pydub import AudioSegment
@@ -34,7 +34,7 @@ def get_next_batch(curr_batch, songs_per_batch, sess):
 	start_position = curr_batch * songs_per_batch
 	end_position = start_position + songs_per_batch
 	for idx in range(start_position, end_position):
-		audio_binary = tf.read_file(file_arr[idx])
+		audio_binary = tf.io.read_file(file_arr[idx])
 		wav_decoder = audio_ops.decode_wav(
 			audio_binary,
 			desired_channels=2)
@@ -79,10 +79,10 @@ def save_to_wav(audio_arr_ch1, audio_arr_ch2, sample_rate, original_song_ch1, or
 	audio_arr = audio_arr.reshape(rows, cols)
 	original_song = original_song.reshape(rows, cols)
 
-	wav_encoder = ffmpeg.encode_audio(
-		audio_arr, file_format='wav', samples_per_second=sample_rate)
-	wav_encoder_orig = ffmpeg.encode_audio(
-		original_song, file_format='wav', samples_per_second=sample_rate)
+	wav_encoder = audio_ops.encode_wav(
+		audio_arr, sample_rate)
+	wav_encoder_orig = audio_ops.encode_wav(
+		original_song, sample_rate)
 
 	wav_file = sess.run(wav_encoder)
 	wav_orig = sess.run(wav_encoder_orig)

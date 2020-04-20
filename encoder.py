@@ -1,6 +1,8 @@
 import process_data
 import math
-import tensorflow as tf
+#import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.compat.v1.disable_eager_execution()
 import numpy as np
 from functools import partial
 
@@ -32,12 +34,12 @@ batches = 1
 
 # Define our placeholder with shape [?, 12348]
 X = tf.placeholder(tf.float32, shape=[None, inputs])
-l2_regularizer = tf.contrib.layers.l2_regularizer(l2)
+l2_regularizer = tf.keras.regularizers.l2(l2)
 
 autoencoder_dnn = partial(tf.layers.dense, 
-						activation = tf.nn.elu,
-						kernel_initializer = tf.contrib.layers.variance_scaling_initializer(),
-						kernel_regularizer=  tf.contrib.layers.l2_regularizer(l2))
+    activation = tf.nn.elu,
+    kernel_initializer = tf.keras.initializers.VarianceScaling(),
+    kernel_regularizer=  tf.keras.regularizers.l2(l2))
 
 hidden_1 = autoencoder_dnn(X, hidden_1_size)
 hidden_2 = autoencoder_dnn(hidden_1, hidden_2_size)
